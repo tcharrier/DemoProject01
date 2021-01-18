@@ -1,0 +1,135 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Workflow CICD
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build-and-test:
+    name: 🧪 Build and Test
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Build and Test
+
+  terraform-sandbox:
+    name: 📦 terraform - Sandbox
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: [build-and-test]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Terraform - Sandbox
+
+  webapp-deploy-sandbox:
+    name: 📦 Webapp Deploy - Sandbox
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: [terraform-sandbox]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Webapp Deploy - Sandbox
+
+  terraform-test:
+    name: 📦 terraform - Test
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: [build-and-test]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Terraform - Test
+
+  webapp-deploy-test:
+    name: 📦 Webapp Deploy - Test
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: [terraform-test]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Webapp Deploy - Test
+
+  k8s-deploy-test:
+    name: 📦 K8S Deploy - Test
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: [build-and-test]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo K8S Deploy - Test
+
+  webapp-deploy-prod:
+    name: 📦 Webapp Deploy - PROD
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    needs: [k8s-deploy-test,webapp-deploy-test,webapp-deploy-sandbox]
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Webapp Deploy - PROD
+
+  validate-site-prod:
+    name: ✔️ Validate Deployment
+    runs-on: ubuntu-latest
+    needs: webapp-deploy-prod
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Validate Deployment
